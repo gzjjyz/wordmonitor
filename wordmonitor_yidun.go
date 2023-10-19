@@ -30,6 +30,13 @@ type YDunMonitor struct {
 	chatBusinessId string
 }
 
+func NewYDunMonitor(ak, sk string) *YDunMonitor {
+	return &YDunMonitor{
+		secretId:  ak,
+		secretKey: sk,
+	}
+}
+
 func (m *YDunMonitor) signature(params url.Values) string {
 	var paramStr string
 	keys := make([]string, 0, len(params))
