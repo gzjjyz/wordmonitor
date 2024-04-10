@@ -28,12 +28,15 @@ type YDunMonitor struct {
 
 	nameBusinessId string
 	chatBusinessId string
+
+	cache *wordCache
 }
 
 func NewYDunMonitor(ak, sk string) *YDunMonitor {
 	return &YDunMonitor{
 		secretId:  ak,
 		secretKey: sk,
+		cache:     newWordCache(),
 	}
 }
 
@@ -54,6 +57,10 @@ func (m *YDunMonitor) signature(params url.Values) string {
 }
 
 func (m *YDunMonitor) check(businessId string, content string, dataId string) (int, error) {
+	exit := m.cache.Exit(content)
+	if exit {
+		return int(Failed), nil
+	}
 	params := url.Values{}
 	params.Set("businessId", businessId)
 	params.Set("secretId", m.secretId)
@@ -85,6 +92,9 @@ func (m *YDunMonitor) check(businessId string, content string, dataId string) (i
 		result := retJson.Get("result")
 		antispam := result.Get("antispam")
 		suggestion, _ := antispam.Get("suggestion").Int() // 0：通过，1：嫌疑，2：不通过
+		if suggestion != 0 {
+			m.cache.Add(content)
+		}
 		return suggestion, nil
 	} else {
 		msg, err := retJson.Get("msg").String()
