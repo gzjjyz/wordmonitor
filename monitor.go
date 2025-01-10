@@ -5,4 +5,5 @@ type Monitor interface {
 	CheckChat(content string) (Ret, error)
 	SetNameBusinessId(string)
 	SetChatBusinessId(string)
+	ClearCache()
 }

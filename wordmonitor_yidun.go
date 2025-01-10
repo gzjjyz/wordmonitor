@@ -122,3 +122,7 @@ func (m *YDunMonitor) SetNameBusinessId(id string) {
 func (m *YDunMonitor) SetChatBusinessId(id string) {
 	m.chatBusinessId = id
 }
+
+func (m *YDunMonitor) ClearCache() {
+	m.cache.Set = make(map[string]struct{})
+}
