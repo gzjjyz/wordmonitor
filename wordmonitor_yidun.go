@@ -105,13 +105,13 @@ func (m *YDunMonitor) check(businessId string, content string, dataId string) (i
 	}
 }
 
-func (m *YDunMonitor) CheckName(content string) (Ret, error) {
-	ret, err := m.check(m.nameBusinessId, content, random.GenerateKey(10))
+func (m *YDunMonitor) CheckName(data *CommonData) (Ret, error) {
+	ret, err := m.check(m.nameBusinessId, data.Content, random.GenerateKey(10))
 	return Ret(ret), err
 }
 
-func (m *YDunMonitor) CheckChat(content string) (Ret, error) {
-	ret, err := m.check(m.chatBusinessId, content, random.GenerateKey(10))
+func (m *YDunMonitor) CheckChat(data *CommonData) (Ret, error) {
+	ret, err := m.check(m.chatBusinessId, data.Content, random.GenerateKey(10))
 	return Ret(ret), err
 }
 
