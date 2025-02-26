@@ -6,6 +6,7 @@ import (
 	"github.com/go-resty/resty/v2"
 	"io"
 	"strconv"
+	"strings"
 	"time"
 )
 
@@ -14,23 +15,24 @@ import (
 const (
 	_360ApiUrl = "http://game.api.1360.com/realchat"
 
-	_360ChatTypeByPrivate   = 1  // 1 私聊；
-	_360ChatTypeByBroadcast = 2  // 2 喇叭；
-	_360ChatTypeByMail      = 3  // 3 邮件；
-	_360ChatTypeByWorld     = 4  // 4 世界；
-	_360ChatTypeByNation    = 5  // 5 国家；
-	_360ChatTypeByGuild     = 6  // 6 工会/帮会；
-	_360ChatTypeByTeam      = 7  // 7 队伍；
-	_360ChatTypeByNear      = 8  // 8 附近；
-	_360ChatTypeByOther     = 9  // 9 其他;
-	_360ChatTypeByName      = 10 // 10 昵称(需要玩家在创建角色的时候，检测昵称是否合规)；
-	_360ChatTypeByNotice    = 11 // 11 公告
+	ChatType360ByPrivate   = 1  // 1 私聊；
+	ChatType360ByBroadcast = 2  // 2 喇叭；
+	ChatType360ByMail      = 3  // 3 邮件；
+	ChatType360ByWorld     = 4  // 4 世界；
+	ChatType360ByNation    = 5  // 5 国家；
+	ChatType360ByGuild     = 6  // 6 工会/帮会；
+	ChatType360ByTeam      = 7  // 7 队伍；
+	ChatType360ByNear      = 8  // 8 附近；
+	ChatType360ByOther     = 9  // 9 其他;
+	ChatType360ByName      = 10 // 10 昵称(需要玩家在创建角色的时候，检测昵称是否合规)；
+	ChatType360ByNotice    = 11 // 11 公告
 
 )
 
 type _360Monitor struct {
 	GKey       string
 	ChannelMap map[int]int
+	LoginKey   string
 }
 
 type _360MonitorReq struct {
@@ -47,10 +49,11 @@ type _360MonitorReq struct {
 	LoginKey string `json:"login_key"`
 }
 
-func New360Monitor(gkey string, channelMap map[int]int) *_360Monitor {
+func New360Monitor(gkey, loginKey string, channelMap map[int]int) *_360Monitor {
 	return &_360Monitor{
 		GKey:       gkey,
 		ChannelMap: channelMap,
+		LoginKey:   loginKey,
 	}
 }
 
@@ -78,17 +81,13 @@ func (r *_360MonitorReq) MakeSign(timeSec int64) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func (m *_360Monitor) build() {
-
-}
-
 func (m *_360Monitor) check(req *_360MonitorReq) (result Ret, err error) {
 	result = Failed
 	unix := time.Now().Unix()
 	formData := req.ToFormData(unix)
 	response, err := resty.New().R().
 		SetFormData(formData).
-		Post("http://game.api.1360.com/realchat")
+		Post(_360ApiUrl)
 	if err != nil {
 		return
 	}
@@ -107,23 +106,42 @@ func (m *_360Monitor) check(req *_360MonitorReq) (result Ret, err error) {
 }
 
 func (m *_360Monitor) CheckName(data *CommonData) (Ret, error) {
+	var platformUniquePlayerId, platformUniqueTargetPlayerId int
+	split := strings.Split(data.PlatformUniquePlayerId, "_")
+	if len(split) > 0 {
+		platformUniquePlayerId, _ = strconv.Atoi(split[0])
+	}
+	split = strings.Split(data.PlatformUniqueTargetPlayerId, "_")
+	if len(split) > 0 {
+		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[0])
+	}
 	ret, err := m.check(&_360MonitorReq{
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
-		QId:      data.PlatformUniquePlayerId,
+		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
-		Type:     _360ChatTypeByName,
-		ToQid:    data.PlatformUniqueTargetPlayerId,
+		Type:     ChatType360ByName,
+		ToQid:    uint64(platformUniqueTargetPlayerId),
 		ToName:   data.TargetActorName,
 		RoleId:   fmt.Sprintf("%d", data.TargetActorId),
 		Content:  data.Content,
 		IP:       data.ActorIP,
-		LoginKey: data.PlatformLoginKey,
+		LoginKey: m.LoginKey,
 	})
 	return ret, err
 }
 
 func (m *_360Monitor) CheckChat(data *CommonData) (Ret, error) {
-	var chatType = uint32(_360ChatTypeByWorld)
+	var platformUniquePlayerId, platformUniqueTargetPlayerId int
+	split := strings.Split(data.PlatformUniquePlayerId, "_")
+	if len(split) > 0 {
+		platformUniquePlayerId, _ = strconv.Atoi(split[0])
+	}
+	split = strings.Split(data.PlatformUniqueTargetPlayerId, "_")
+	if len(split) > 0 {
+		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[0])
+	}
+
+	var chatType = uint32(ChatType360ByWorld)
 	if m.ChannelMap != nil {
 		val, ok := m.ChannelMap[int(data.ChatChannel)]
 		if ok {
@@ -132,15 +150,15 @@ func (m *_360Monitor) CheckChat(data *CommonData) (Ret, error) {
 	}
 	ret, err := m.check(&_360MonitorReq{
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
-		QId:      data.PlatformUniquePlayerId,
+		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
 		Type:     chatType,
-		ToQid:    data.PlatformUniqueTargetPlayerId,
+		ToQid:    uint64(platformUniqueTargetPlayerId),
 		ToName:   data.TargetActorName,
 		RoleId:   fmt.Sprintf("%d", data.TargetActorId),
 		Content:  data.Content,
 		IP:       data.ActorIP,
-		LoginKey: data.PlatformLoginKey,
+		LoginKey: m.LoginKey,
 	})
 	return ret, err
 }
