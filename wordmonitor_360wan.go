@@ -29,13 +29,13 @@ const (
 
 )
 
-type _360Monitor struct {
+type _360WanMonitor struct {
 	GKey       string
 	ChannelMap map[int]int
 	LoginKey   string
 }
 
-type _360MonitorReq struct {
+type _360WanMonitorReq struct {
 	GKey     string `json:"gkey"`
 	ServerId string `json:"server_id"`
 	QId      uint64 `json:"qid"`
@@ -49,15 +49,15 @@ type _360MonitorReq struct {
 	LoginKey string `json:"login_key"`
 }
 
-func New360Monitor(gkey, loginKey string, channelMap map[int]int) *_360Monitor {
-	return &_360Monitor{
+func New360WanMonitor(gkey, loginKey string, channelMap map[int]int) *_360WanMonitor {
+	return &_360WanMonitor{
 		GKey:       gkey,
 		ChannelMap: channelMap,
 		LoginKey:   loginKey,
 	}
 }
 
-func (r *_360MonitorReq) ToFormData(timeSec int64) map[string]string {
+func (r *_360WanMonitorReq) ToFormData(timeSec int64) map[string]string {
 	return map[string]string{
 		"gkey":      r.GKey,
 		"server_id": r.ServerId,
@@ -75,13 +75,13 @@ func (r *_360MonitorReq) ToFormData(timeSec int64) map[string]string {
 	}
 }
 
-func (r *_360MonitorReq) MakeSign(timeSec int64) string {
+func (r *_360WanMonitorReq) MakeSign(timeSec int64) string {
 	h := md5.New()
 	io.WriteString(h, fmt.Sprintf("%s%s%d%s%d%d%s%s%d%s%s", "", r.ServerId, r.QId, r.Name, r.Type, r.ToQid, r.ToName, r.Content, timeSec, r.IP, r.LoginKey))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func (m *_360Monitor) check(req *_360MonitorReq) (result Ret, err error) {
+func (m *_360WanMonitor) check(req *_360WanMonitorReq) (result Ret, err error) {
 	result = Failed
 	unix := time.Now().Unix()
 	formData := req.ToFormData(unix)
@@ -105,17 +105,17 @@ func (m *_360Monitor) check(req *_360MonitorReq) (result Ret, err error) {
 	return
 }
 
-func (m *_360Monitor) CheckName(data *CommonData) (Ret, error) {
+func (m *_360WanMonitor) CheckName(data *CommonData) (Ret, error) {
 	var platformUniquePlayerId, platformUniqueTargetPlayerId int
 	split := strings.Split(data.PlatformUniquePlayerId, "_")
 	if len(split) > 0 {
-		platformUniquePlayerId, _ = strconv.Atoi(split[0])
+		platformUniquePlayerId, _ = strconv.Atoi(split[len(split)-1])
 	}
 	split = strings.Split(data.PlatformUniqueTargetPlayerId, "_")
 	if len(split) > 0 {
-		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[0])
+		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[len(split)-1])
 	}
-	ret, err := m.check(&_360MonitorReq{
+	ret, err := m.check(&_360WanMonitorReq{
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
 		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
@@ -130,15 +130,15 @@ func (m *_360Monitor) CheckName(data *CommonData) (Ret, error) {
 	return ret, err
 }
 
-func (m *_360Monitor) CheckChat(data *CommonData) (Ret, error) {
+func (m *_360WanMonitor) CheckChat(data *CommonData) (Ret, error) {
 	var platformUniquePlayerId, platformUniqueTargetPlayerId int
 	split := strings.Split(data.PlatformUniquePlayerId, "_")
 	if len(split) > 0 {
-		platformUniquePlayerId, _ = strconv.Atoi(split[0])
+		platformUniquePlayerId, _ = strconv.Atoi(split[len(split)-1])
 	}
 	split = strings.Split(data.PlatformUniqueTargetPlayerId, "_")
 	if len(split) > 0 {
-		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[0])
+		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[len(split)-1])
 	}
 
 	var chatType = uint32(ChatType360ByWorld)
@@ -148,7 +148,7 @@ func (m *_360Monitor) CheckChat(data *CommonData) (Ret, error) {
 			chatType = uint32(val)
 		}
 	}
-	ret, err := m.check(&_360MonitorReq{
+	ret, err := m.check(&_360WanMonitorReq{
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
 		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
@@ -163,11 +163,11 @@ func (m *_360Monitor) CheckChat(data *CommonData) (Ret, error) {
 	return ret, err
 }
 
-func (m *_360Monitor) SetNameBusinessId(id string) {
+func (m *_360WanMonitor) SetNameBusinessId(id string) {
 }
 
-func (m *_360Monitor) SetChatBusinessId(id string) {
+func (m *_360WanMonitor) SetChatBusinessId(id string) {
 }
 
-func (m *_360Monitor) ClearCache() {
+func (m *_360WanMonitor) ClearCache() {
 }
