@@ -82,7 +82,7 @@ func (r *_360WanMonitorReq) ToFormData(timeSec int64) map[string]string {
 
 func (r *_360WanMonitorReq) MakeSign(timeSec int64) string {
 	h := md5.New()
-	io.WriteString(h, fmt.Sprintf("%s%s%d%s%d%d%s%s%d%s%s", "", r.ServerId, r.QId, r.Name, r.Type, r.ToQid, r.ToName, r.Content, timeSec, r.IP, r.LoginKey))
+	io.WriteString(h, fmt.Sprintf("%s%s%d%s%d%d%s%s%d%s%s", r.GKey, r.ServerId, r.QId, r.Name, r.Type, r.ToQid, r.ToName, r.Content, timeSec, r.IP, r.LoginKey))
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
