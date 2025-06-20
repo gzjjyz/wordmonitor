@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"io"
+	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -62,12 +63,12 @@ func (r *_360WanMonitorReq) ToFormData(timeSec int64) map[string]string {
 		"gkey":      r.GKey,
 		"server_id": r.ServerId,
 		"qid":       fmt.Sprintf("%d", r.QId),
-		"name":      r.Name,
+		"name":      url.QueryEscape(r.Name),
 		"type":      fmt.Sprintf("%d", r.Type),
 		"toqid":     fmt.Sprintf("%d", r.ToQid),
-		"toname":    r.ToName,
+		"toname":    url.QueryEscape(r.ToName),
 		"roleid":    r.RoleId,
-		"content":   r.Content,
+		"content":   url.QueryEscape(r.Content),
 		"time":      fmt.Sprintf("%d", timeSec),
 		"ip":        r.IP,
 		"retint":    fmt.Sprintf("%d", 1),
@@ -116,6 +117,7 @@ func (m *_360WanMonitor) CheckName(data *CommonData) (Ret, error) {
 		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[len(split)-1])
 	}
 	ret, err := m.check(&_360WanMonitorReq{
+		GKey:     m.GKey,
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
 		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
@@ -149,6 +151,7 @@ func (m *_360WanMonitor) CheckChat(data *CommonData) (Ret, error) {
 		}
 	}
 	ret, err := m.check(&_360WanMonitorReq{
+		GKey:     m.GKey,
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
 		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
