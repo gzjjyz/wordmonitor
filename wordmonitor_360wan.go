@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"github.com/go-resty/resty/v2"
 	"io"
-	"net/url"
 	"strconv"
 	"strings"
 	"time"
@@ -59,10 +58,6 @@ func New360WanMonitor(gkey, loginKey string, channelMap map[int]int) *_360WanMon
 }
 
 func (r *_360WanMonitorReq) ToFormData(timeSec int64) map[string]string {
-	r.Name = url.QueryEscape(r.Name)
-	r.ToName = url.QueryEscape(r.ToName)
-	r.Content = url.QueryEscape(r.Content)
-
 	return map[string]string{
 		"gkey":      r.GKey,
 		"server_id": r.ServerId,
@@ -128,7 +123,7 @@ func (m *_360WanMonitor) CheckName(data *CommonData) (Ret, error) {
 		Type:     ChatType360ByName,
 		ToQid:    uint64(platformUniqueTargetPlayerId),
 		ToName:   data.TargetActorName,
-		RoleId:   fmt.Sprintf("%d", data.TargetActorId),
+		RoleId:   fmt.Sprintf("%d", data.ActorId),
 		Content:  data.Content,
 		IP:       data.ActorIP,
 		LoginKey: m.LoginKey,
@@ -162,7 +157,7 @@ func (m *_360WanMonitor) CheckChat(data *CommonData) (Ret, error) {
 		Type:     chatType,
 		ToQid:    uint64(platformUniqueTargetPlayerId),
 		ToName:   data.TargetActorName,
-		RoleId:   fmt.Sprintf("%d", data.TargetActorId),
+		RoleId:   fmt.Sprintf("%d", data.ActorId),
 		Content:  data.Content,
 		IP:       data.ActorIP,
 		LoginKey: m.LoginKey,
