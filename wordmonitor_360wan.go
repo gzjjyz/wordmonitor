@@ -59,16 +59,20 @@ func New360WanMonitor(gkey, loginKey string, channelMap map[int]int) *_360WanMon
 }
 
 func (r *_360WanMonitorReq) ToFormData(timeSec int64) map[string]string {
+	r.Name = url.QueryEscape(r.Name)
+	r.ToName = url.QueryEscape(r.ToName)
+	r.Content = url.QueryEscape(r.Content)
+
 	return map[string]string{
 		"gkey":      r.GKey,
 		"server_id": r.ServerId,
 		"qid":       fmt.Sprintf("%d", r.QId),
-		"name":      url.QueryEscape(r.Name),
+		"name":      r.Name,
 		"type":      fmt.Sprintf("%d", r.Type),
 		"toqid":     fmt.Sprintf("%d", r.ToQid),
-		"toname":    url.QueryEscape(r.ToName),
+		"toname":    r.ToName,
 		"roleid":    r.RoleId,
-		"content":   url.QueryEscape(r.Content),
+		"content":   r.Content,
 		"time":      fmt.Sprintf("%d", timeSec),
 		"ip":        r.IP,
 		"retint":    fmt.Sprintf("%d", 1),
