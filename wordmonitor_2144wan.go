@@ -118,6 +118,34 @@ func (m *_2144WanMonitor) check(req *_2144WanMonitorReq) (result Ret, err error)
 	return
 }
 
+func (m *_2144WanMonitor) CheckName(data *CommonData) (Ret, error) {
+	var platformUniquePlayerId, platformUniqueTargetPlayerId int
+	split := strings.Split(data.PlatformUniquePlayerId, "_")
+	if len(split) > 0 {
+		platformUniquePlayerId, _ = strconv.Atoi(split[len(split)-1])
+	}
+	split = strings.Split(data.PlatformUniqueTargetPlayerId, "_")
+	if len(split) > 0 {
+		platformUniqueTargetPlayerId, _ = strconv.Atoi(split[len(split)-1])
+	}
+	ret, err := m.check(&_2144WanMonitorReq{
+		GKey:     m.GKey,
+		ServerId: fmt.Sprintf("S%d", data.SrvId),
+		QId:      uint64(platformUniquePlayerId),
+		Name:     data.ActorName,
+		RoleId:   fmt.Sprintf("%d", data.ActorId),
+		Type:     ChatType2144ByName,
+		ToQid:    uint64(platformUniqueTargetPlayerId),
+		ToName:   data.TargetActorName,
+		ToRoleId: fmt.Sprintf("%d", data.TargetActorId),
+		Content:  data.Content,
+		IP:       data.ActorIP,
+		GuildId:  fmt.Sprintf("%d", data.GuildId),
+		LoginKey: m.LoginKey,
+	})
+	return ret, err
+}
+
 func (m *_2144WanMonitor) CheckChat(data *CommonData) (Ret, error) {
 	var platformUniquePlayerId, platformUniqueTargetPlayerId int
 	split := strings.Split(data.PlatformUniquePlayerId, "_")
