@@ -46,12 +46,14 @@ type _2144WanMonitorReq struct {
 	ServerId string `json:"server_id"`
 	QId      uint64 `json:"qid"`
 	Name     string `json:"name"`
+	RoleId   string `json:"role_id"`
 	Type     uint32 `json:"type"`
 	ToQid    uint64 `json:"toqid"`
 	ToName   string `json:"toname"`
-	RoleId   string `json:"roleid"`
+	ToRoleId string `json:"to_role_id"`
 	Content  string `json:"content"`
 	IP       string `json:"ip"`
+	GuildId  string `json:"guild_id"`
 	LoginKey string `json:"login_key"`
 }
 
@@ -65,19 +67,20 @@ func New2144WanMonitor(gkey, loginKey string, channelMap map[int]int) *_2144WanM
 
 func (r *_2144WanMonitorReq) ToFormData(timeSec int64) map[string]string {
 	return map[string]string{
-		"gkey":      r.GKey,
-		"server_id": r.ServerId,
-		"qid":       fmt.Sprintf("%d", r.QId),
-		"name":      r.Name,
-		"type":      fmt.Sprintf("%d", r.Type),
-		"toqid":     fmt.Sprintf("%d", r.ToQid),
-		"toname":    r.ToName,
-		"roleid":    r.RoleId,
-		"content":   r.Content,
-		"time":      fmt.Sprintf("%d", timeSec),
-		"ip":        r.IP,
-		"retint":    fmt.Sprintf("%d", 1),
-		"sign":      r.MakeSign(timeSec),
+		"gkey":       r.GKey,
+		"server_id":  r.ServerId,
+		"qid":        fmt.Sprintf("%d", r.QId),
+		"name":       r.Name,
+		"role_id":    r.RoleId,
+		"type":       fmt.Sprintf("%d", r.Type),
+		"toqid":      fmt.Sprintf("%d", r.ToQid),
+		"toname":     r.ToName,
+		"to_role_id": r.ToRoleId,
+		"content":    r.Content,
+		"time":       fmt.Sprintf("%d", timeSec),
+		"ip":         r.IP,
+		"guild_id":   r.GuildId,
+		"sign":       r.MakeSign(timeSec),
 	}
 }
 
@@ -160,12 +163,14 @@ func (m *_2144WanMonitor) CheckChat(data *CommonData) (Ret, error) {
 		ServerId: fmt.Sprintf("S%d", data.SrvId),
 		QId:      uint64(platformUniquePlayerId),
 		Name:     data.ActorName,
+		RoleId:   fmt.Sprintf("%d", data.ActorId),
 		Type:     chatType,
 		ToQid:    uint64(platformUniqueTargetPlayerId),
 		ToName:   data.TargetActorName,
-		RoleId:   fmt.Sprintf("%d", data.ActorId),
+		ToRoleId: fmt.Sprintf("%d", data.TargetActorId),
 		Content:  data.Content,
 		IP:       data.ActorIP,
+		GuildId:  fmt.Sprintf("%d", data.GuildId),
 		LoginKey: m.LoginKey,
 	})
 	return ret, err

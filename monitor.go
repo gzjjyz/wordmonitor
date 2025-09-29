@@ -20,4 +20,5 @@ type CommonData struct {
 
 	SrvId       uint32 // 服务器 id
 	ChatChannel uint32 // 聊天频道
+	GuildId     uint64 // 仙盟id
 }
