@@ -9,6 +9,7 @@ package wordmonitor
 import (
 	"crypto/md5"
 	"fmt"
+	"github.com/bitly/go-simplejson"
 	"github.com/go-resty/resty/v2"
 	"io"
 	"strconv"
@@ -100,15 +101,17 @@ func (m *_2144WanMonitor) check(req *_2144WanMonitorReq) (result Ret, err error)
 	if err != nil {
 		return
 	}
-	code, _ := strconv.Atoi(string(response.Body()))
-	switch code {
-	case 1:
+	body := response.Body()
+
+	retJson, err := simplejson.NewJson(body)
+	if err != nil {
+		return
+	}
+
+	isSuccess, _ := retJson.Get("success").Bool()
+	if isSuccess {
 		result = Success
-	case 4:
-		err = fmt.Errorf("签名错误")
-	case 5:
-		err = fmt.Errorf("其他错误")
-	default:
+	} else {
 		err = fmt.Errorf("检测不通过")
 	}
 	return
