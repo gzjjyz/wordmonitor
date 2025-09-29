@@ -110,8 +110,10 @@ func (m *_2144WanMonitor) check(req *_2144WanMonitorReq) (result Ret, err error)
 
 	content, _ := retJson.Get("content").String()
 	isSuccess, _ := retJson.Get("success").Bool()
-	if isSuccess && content == req.Content {
-		result = Success
+	if isSuccess {
+		if content == req.Content {
+			result = Success
+		}
 	} else {
 		err = fmt.Errorf("检测不通过")
 	}
