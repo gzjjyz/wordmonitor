@@ -77,9 +77,9 @@ func (r *_9HouMonitorReq) ToFormData(timeSec int64) map[string]string {
 		"trole_name": r.TRoleName,
 		"trole_id":   fmt.Sprintf("%d", r.TRoleId),
 		"chat_body":  r.ChatBody,
-		"login_key":  r.LoginKey,
 		"time":       fmt.Sprintf("%d", timeSec),
 		"sign":       r.MakeSign(timeSec),
+		"api":        "ban_keywords",
 	}
 }
 
