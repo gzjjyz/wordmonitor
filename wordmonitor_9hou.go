@@ -108,9 +108,8 @@ func (m *_9HouMonitor) check(req *_9HouMonitorReq) (result Ret, err error) {
 	}
 
 	code, _ := retJson.Get("is_ban_words").String()
-	content, _ := retJson.Get("msg").String()
 	if strings.EqualFold(code, "1") {
-		err = fmt.Errorf("检测不通过 %s", content)
+		err = fmt.Errorf("检测不通过 %s", string(body))
 	} else {
 		result = Success
 	}
