@@ -107,9 +107,9 @@ func (m *_9HouMonitor) check(req *_9HouMonitorReq) (result Ret, err error) {
 		return
 	}
 
-	code, _ := retJson.Get("code").Int()
+	code, _ := retJson.Get("code").String()
 	content, _ := retJson.Get("msg").String()
-	if code == 1 {
+	if strings.EqualFold(code, "1") {
 		result = Success
 	} else {
 		err = fmt.Errorf("检测不通过 %s", content)
