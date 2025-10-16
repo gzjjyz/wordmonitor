@@ -79,7 +79,6 @@ func (r *_9HouMonitorReq) ToFormData(timeSec int64) map[string]string {
 		"chat_body":  r.ChatBody,
 		"time":       fmt.Sprintf("%d", timeSec),
 		"sign":       r.MakeSign(timeSec),
-		"api":        "ban_keywords",
 	}
 }
 
@@ -90,10 +89,13 @@ func (r *_9HouMonitorReq) MakeSign(timeSec int64) string {
 	return fmt.Sprintf("%x", h.Sum(nil))
 }
 
-func (m *_9HouMonitor) check(req *_9HouMonitorReq) (result Ret, err error) {
+func (m *_9HouMonitor) check(req *_9HouMonitorReq, needBeforeCheck bool) (result Ret, err error) {
 	result = Failed
 	unix := time.Now().Unix()
 	formData := req.ToFormData(unix)
+	if needBeforeCheck {
+		formData["api"] = "ban_keywords"
+	}
 	response, err := resty.New().R().
 		SetFormData(formData).
 		Post(_9HouApiUrl)
@@ -139,6 +141,20 @@ func (m *_9HouMonitor) CheckChat(data *CommonData) (Ret, error) {
 			chatType = uint32(val)
 		}
 	}
+	req := &_9HouMonitorReq{
+		Type:      uint64(m.Type),
+		Uid:       uint64(platformUniquePlayerId),
+		Gid:       uint64(m.Gid),
+		Sid:       uint64(data.SrvId),
+		URoleName: data.ActorName,
+		URoleId:   data.ActorId,
+		Channel:   uint64(chatType),
+		Tid:       data.TargetActorId,
+		TRoleName: data.TargetActorName,
+		TRoleId:   uint64(platformUniqueTargetPlayerId),
+		ChatBody:  data.Content,
+		LoginKey:  m.LoginKey,
+	}
 	ret, err := m.check(&_9HouMonitorReq{
 		Type:      uint64(m.Type),
 		Uid:       uint64(platformUniquePlayerId),
@@ -152,7 +168,10 @@ func (m *_9HouMonitor) CheckChat(data *CommonData) (Ret, error) {
 		TRoleId:   uint64(platformUniqueTargetPlayerId),
 		ChatBody:  data.Content,
 		LoginKey:  m.LoginKey,
-	})
+	}, true)
+	if err == nil && ret == Success {
+		m.check(req, false)
+	}
 	return ret, err
 }
 
