@@ -113,9 +113,11 @@ func (m *_2144WanMonitor) check(req *_2144WanMonitorReq) (result Ret, err error)
 	if isSuccess {
 		if content == req.Content {
 			result = Success
+		} else {
+			err = fmt.Errorf("检测不通过")
 		}
 	} else {
-		err = fmt.Errorf("检测不通过")
+		err = fmt.Errorf("请求失败")
 	}
 	return
 }
