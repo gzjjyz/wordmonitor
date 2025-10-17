@@ -122,7 +122,7 @@ func (m *_2144WanMonitor) check(req *_2144WanMonitorReq) (result Ret, err error)
 
 func (m *_2144WanMonitor) CheckName(data *CommonData) (Ret, error) {
 	// 不提供校验取名 默认不通过
-	return Failed, nil
+	return Success, nil
 }
 
 func (m *_2144WanMonitor) CheckChat(data *CommonData) (Ret, error) {
