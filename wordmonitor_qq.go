@@ -151,7 +151,7 @@ func (m *_qqWanMonitor) CheckChat(data *CommonData) (Ret, error) {
 		"format":  m.Format,
 	}
 
-	sig := genTencentSig("GET", "/v3/user/get_info", params, m.AppKey)
+	sig := genTencentSig("POST", "/v3/user/uic_filter", params, m.AppKey)
 
 	ret, err := m.check(&_qqWanMonitorReq{
 		OpenId:      fmt.Sprintf("%d", data.ActorId),
@@ -180,7 +180,7 @@ func (m *_qqWanMonitor) CheckName(data *CommonData) (Ret, error) {
 		"format":  m.Format,
 	}
 
-	sig := genTencentSig("GET", "/v3/user/get_info", params, m.AppKey)
+	sig := genTencentSig("POST", "/v3/user/uic_filter", params, m.AppKey)
 
 	ret, err := m.check(&_qqWanMonitorReq{
 		OpenId:      fmt.Sprintf("%d", data.ActorId),
