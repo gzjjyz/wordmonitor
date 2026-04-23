@@ -41,8 +41,6 @@ type _qqWanMonitor struct {
 type _qqWanMonitorReq struct {
 	OpenId      string `json:"openid"`
 	OpenKey     string `json:"openkey"`
-	AppId       string `json:"appid"`
-	Sig         string `json:"sig"`
 	Content     string `json:"content"`
 	ContentType int    `json:"contenttype"`
 }
@@ -86,12 +84,13 @@ func NewQQWanMonitor(appId, appKey, qZonePF, formatJson string) *_qqWanMonitor {
 		Format:  formatJson,
 	}
 }
-func (r *_qqWanMonitorReq) buildParams() map[string]string {
+func (m *_qqWanMonitor) buildParams(r *_qqWanMonitorReq) map[string]string {
 	return map[string]string{
 		"openid":  r.OpenId,
 		"openkey": r.OpenKey,
-		"appid":   r.AppId,
-		"sig":     r.Sig,
+		"appid":   m.AppId,
+		"pf":      m.QZonePF,
+		"format":  m.Format,
 	}
 }
 
@@ -108,7 +107,10 @@ func (r *_qqWanMonitorReq) buildBody() map[string]interface{} {
 
 func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 	result = Failed
-	params := req.buildParams()
+	params := m.buildParams(req)
+	sig := genTencentSig("POST", "/v3/user/uic_filter", params, m.AppKey)
+	params["sig"] = sig
+
 	body := req.buildBody()
 
 	response, err := resty.New().R().
@@ -138,22 +140,9 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 func (m *_qqWanMonitor) CheckChat(data *CommonData) (Ret, error) {
 	var platformUniquePlayerId = GetPlatformUid(data.PlatformUniquePlayerId)
 
-	params := map[string]string{
-		"openid":  platformUniquePlayerId,
-		"openkey": data.OpenKey,
-		"userip":  data.ActorIP,
-		"appid":   m.AppId,
-		"pf":      m.QZonePF,
-		"format":  m.Format,
-	}
-
-	sig := genTencentSig("POST", "/v3/user/uic_filter", params, m.AppKey)
-
 	ret, err := m.check(&_qqWanMonitorReq{
-		OpenId:      fmt.Sprintf("%d", data.ActorId),
+		OpenId:      platformUniquePlayerId,
 		OpenKey:     data.OpenKey,
-		AppId:       m.AppId,
-		Sig:         sig,
 		Content:     data.Content,
 		ContentType: ContentTypeQQWanByMessage,
 	})
@@ -163,22 +152,9 @@ func (m *_qqWanMonitor) CheckChat(data *CommonData) (Ret, error) {
 func (m *_qqWanMonitor) CheckName(data *CommonData) (Ret, error) {
 	var platformUniquePlayerId = GetPlatformUid(data.PlatformUniquePlayerId)
 
-	params := map[string]string{
-		"openid":  platformUniquePlayerId,
-		"openkey": data.OpenKey,
-		"userip":  data.ActorIP,
-		"appid":   m.AppId,
-		"pf":      m.QZonePF,
-		"format":  m.Format,
-	}
-
-	sig := genTencentSig("POST", "/v3/user/uic_filter", params, m.AppKey)
-
 	ret, err := m.check(&_qqWanMonitorReq{
-		OpenId:      fmt.Sprintf("%d", data.ActorId),
+		OpenId:      platformUniquePlayerId,
 		OpenKey:     data.OpenKey,
-		AppId:       m.AppId,
-		Sig:         sig,
 		Content:     data.Content,
 		ContentType: ContentTypeQQWanByName,
 	})
