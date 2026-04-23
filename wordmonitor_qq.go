@@ -130,8 +130,7 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 	if ret == 0 {
 		result = Success
 	} else {
-		msg := retJson.Get("msg").MustString()
-		err = fmt.Errorf("检测不通过:msg:%v,params:%+v", msg, params)
+		err = fmt.Errorf("检测不通过")
 	}
 	return
 }
