@@ -137,14 +137,10 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 }
 
 func (m *_qqWanMonitor) CheckChat(data *CommonData) (Ret, error) {
-	var platformUniquePlayerId int
-	split := strings.Split(data.PlatformUniquePlayerId, "_")
-	if len(split) > 0 {
-		platformUniquePlayerId, _ = strconv.Atoi(split[len(split)-1])
-	}
+	var platformUniquePlayerId = GetPlatformUid(data.PlatformUniquePlayerId)
 
 	params := map[string]string{
-		"openid":  fmt.Sprintf("%d", platformUniquePlayerId),
+		"openid":  platformUniquePlayerId,
 		"openkey": data.OpenKey,
 		"userip":  data.ActorIP,
 		"appid":   m.AppId,
