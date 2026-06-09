@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"github.com/bitly/go-simplejson"
 	"github.com/go-resty/resty/v2"
+	"log"
 	"net/url"
 	"sort"
 	"strings"
@@ -126,14 +127,26 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 	if err != nil {
 		return
 	}
-
+	log.Printf("qq params %+v, resp: %+v", params, retJson)
 	ret := retJson.Get("ret").MustInt(-1)
 	if ret == 0 {
+		textResultList := retJson.Get("text_result_list_")
+		for i := 0; i < len(textResultList.MustArray()); i++ {
+			checkRet := textResultList.GetIndex(i).Get("check_ret_").MustInt(0)
+			punishType := textResultList.GetIndex(i).Get("punish_type_").MustInt(0)
+			resultText := textResultList.GetIndex(i).Get("result_text_").MustString("")
+
+			if checkRet != 0 {
+				err = fmt.Errorf("检测不通过:punish_type:%d, result_text:%s", punishType, resultText)
+				return
+			}
+		}
 		result = Success
 	} else {
 		msg := retJson.Get("msg").MustString()
 		err = fmt.Errorf("检测不通过:msg:%v,params:%+v", msg, params)
 	}
+
 	return
 }
 
