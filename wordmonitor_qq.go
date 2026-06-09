@@ -120,11 +120,13 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 		SetBody(body).
 		Post(_qqApiUrl)
 	if err != nil {
+		log.Printf("err:%v", err)
 		return
 	}
 
 	retJson, err := simplejson.NewJson(response.Body())
 	if err != nil {
+		log.Printf("err:%v", err)
 		return
 	}
 	log.Printf("qq params %+v, resp: %+v", params, retJson)
@@ -151,6 +153,7 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 }
 
 func (m *_qqWanMonitor) CheckChat(data *CommonData) (Ret, error) {
+	log.Printf("CheckChat:%+v", data)
 	var platformUniquePlayerId = GetPlatformUid(data.PlatformUniquePlayerId)
 
 	ret, err := m.check(&_qqWanMonitorReq{
@@ -163,6 +166,7 @@ func (m *_qqWanMonitor) CheckChat(data *CommonData) (Ret, error) {
 }
 
 func (m *_qqWanMonitor) CheckName(data *CommonData) (Ret, error) {
+	log.Printf("CheckName:%+v", data)
 	var platformUniquePlayerId = GetPlatformUid(data.PlatformUniquePlayerId)
 
 	ret, err := m.check(&_qqWanMonitorReq{
