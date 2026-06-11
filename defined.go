@@ -12,10 +12,10 @@ const (
 	Failed  Ret = 2 // 不通过
 )
 
-func GetPlatformUid(account string) (uid string) {
-	split := strings.Split(account, "_")
-	if len(split) > 0 {
-		uid = split[len(split)-1]
+func GetPlatformUid(platformUniquePlayerId string) string {
+	split := strings.SplitN(platformUniquePlayerId, "_", 2)
+	if len(split) > 1 {
+		return split[1]
 	}
-	return
+	return platformUniquePlayerId
 }
