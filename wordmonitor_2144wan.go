@@ -10,7 +10,6 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/bitly/go-simplejson"
-	"github.com/go-resty/resty/v2"
 	"io"
 	"strconv"
 	"strings"
@@ -95,7 +94,7 @@ func (m *_2144WanMonitor) check(req *_2144WanMonitorReq) (result Ret, err error)
 	result = Failed
 	unix := time.Now().Unix()
 	formData := req.ToFormData(unix)
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetFormData(formData).
 		Post(_2144ApiUrl)
 	if err != nil {

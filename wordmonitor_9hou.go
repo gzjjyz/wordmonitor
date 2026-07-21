@@ -10,7 +10,6 @@ import (
 	"crypto/md5"
 	"fmt"
 	"github.com/bitly/go-simplejson"
-	"github.com/go-resty/resty/v2"
 	"io"
 	"strconv"
 	"strings"
@@ -96,7 +95,7 @@ func (m *_9HouMonitor) check(req *_9HouMonitorReq, needBeforeCheck bool) (result
 	if needBeforeCheck {
 		formData["api"] = "ban_keywords"
 	}
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetFormData(formData).
 		Post(_9HouApiUrl)
 	if err != nil {

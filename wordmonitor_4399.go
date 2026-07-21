@@ -9,7 +9,6 @@ package wordmonitor
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"io"
 )
 
@@ -44,7 +43,7 @@ func (r *_4399MonitorReq) MakeSign(secret string) string {
 
 func (m *_4399Monitor) check(req *_4399MonitorReq) (result Ret, err error) {
 	result = Failed
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetQueryParams(map[string]string{
 			"toCheck":  req.ToCheck,
 			"app":      m.App,

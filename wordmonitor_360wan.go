@@ -3,7 +3,6 @@ package wordmonitor
 import (
 	"crypto/md5"
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"io"
 	"strconv"
 	"strings"
@@ -85,7 +84,7 @@ func (m *_360WanMonitor) check(req *_360WanMonitorReq) (result Ret, err error) {
 	result = Failed
 	unix := time.Now().Unix()
 	formData := req.ToFormData(unix)
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetFormData(formData).
 		Post(_360ApiUrl)
 	if err != nil {

@@ -12,7 +12,6 @@ import (
 	"encoding/base64"
 	"fmt"
 	"github.com/bitly/go-simplejson"
-	"github.com/go-resty/resty/v2"
 	"net/url"
 	"sort"
 	"strings"
@@ -113,7 +112,7 @@ func (m *_qqWanMonitor) check(req *_qqWanMonitorReq) (result Ret, err error) {
 
 	body := req.buildBody()
 
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetQueryParams(params).
 		SetHeader("Content-Type", "application/json; charset=utf-8").
 		SetBody(body).

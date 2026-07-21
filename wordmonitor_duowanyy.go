@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"github.com/bitly/go-simplejson"
-	"github.com/go-resty/resty/v2"
 	"time"
 )
 
@@ -77,7 +76,7 @@ func (r *_DuoWanYYMonitor) check(req *_DuoWanYYMonitorReq) (result Ret, err erro
 	result = Failed
 	unix := time.Now().Unix()
 	formData := req.ToFormData(unix)
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetFormData(formData).
 		Post(_DuoWanYYApiUrl)
 	if err != nil {

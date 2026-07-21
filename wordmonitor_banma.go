@@ -10,7 +10,6 @@ import (
 	"crypto/md5"
 	"encoding/json"
 	"fmt"
-	"github.com/go-resty/resty/v2"
 	"io"
 )
 
@@ -61,7 +60,7 @@ func (r *_BanMaMonitorReq) MakeSign(secret string) string {
 
 func (m *_BanMaMonitor) check(req *_BanMaMonitorReq) (result Ret, err error) {
 	result = Failed
-	response, err := resty.New().R().
+	response, err := GetRestyClient().R().
 		SetQueryParams(map[string]string{
 			"toCheck":  req.ToCheck,
 			"appid":    m.AppId,
