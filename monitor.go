@@ -8,7 +8,16 @@ type Monitor interface {
 	ClearCache()
 }
 
+// 名称来源，CheckTypeName 时用于区分是哪种取名场景
+const (
+	NameSourceRole        = 1 // 角色名
+	NameSourceGuild       = 2 // 仙盟名
+	NameSourceGuildNotice = 3 // 仙盟公告
+)
+
 type CommonData struct {
+	NameSource uint32
+
 	ActorId                      uint64
 	ActorName                    string
 	ActorIP                      string
