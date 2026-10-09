@@ -31,4 +31,5 @@ type CommonData struct {
 	ChatChannel uint32 // 聊天频道
 	GuildId     uint64 // 仙盟id
 	OpenKey     string // 平台登录 key
+	Platform    string // 平台渠道标识
 }

@@ -165,11 +165,11 @@ func (m *_CsjxMonitor) CheckName(data *CommonData) (Ret, error) {
 	if val, ok := _csjxNameSceneRef[data.NameSource]; ok {
 		scene = val
 	}
-	return m.textCheck(data.OpenKey, scene, data.Content)
+	return m.textCheck(data.Platform, scene, data.Content)
 }
 
 func (m *_CsjxMonitor) CheckChat(data *CommonData) (Ret, error) {
-	ret, err := m.textCheck(data.OpenKey, SceneCsjxByChat, data.Content)
+	ret, err := m.textCheck(data.Platform, SceneCsjxByChat, data.Content)
 	if err != nil || ret != Success {
 		return ret, err
 	}
